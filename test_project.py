@@ -18,7 +18,7 @@ def test_deal_hands():
     deck = createdeck()
     hands = [Hand() for _ in range(27)]  # 26 players + 1 dealer
     with pytest.raises(ValueError):
-        dealhands(deck, 26, hands)  # Not enough cards to deal to 26 players + dealer
+        dealhands(deck, hands)  # Not enough cards to deal to 26 players + dealer
 
 def test_dealers_turn():
     deck = createdeck()
