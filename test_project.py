@@ -1,5 +1,5 @@
 import pytest
-from project import Hand, createdeck, dealhands, dealers_turn, hit_or_stand, result_hand
+from project import Hand, createdeck, dealhands, dealers_turn, hit_or_stand, result_hand, threshold_strategy
 
 def test_create_deck():
     deck = createdeck()
@@ -104,3 +104,13 @@ def test_hit_or_stand(monkeypatch):
     
     # After hitting, the player's hand should have 3 cards
     assert len(hands[1].cards) == 3
+
+def test_threshold_strategy():
+    hand = Hand()
+    hand.cards.append(('9', 'Hearts'))
+    hand.cards.append(('7', 'Diamonds'))
+    
+    # Test the threshold strategy
+    assert threshold_strategy(hand, 17) == 'h'  # Player should hit if value is below threshold
+    assert threshold_strategy(hand, 15) == 's'  # Player should stand if value is above threshold
+    assert threshold_strategy(hand, 16) == 's'  # Player should stand if value is at threshold

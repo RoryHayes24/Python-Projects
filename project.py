@@ -142,3 +142,10 @@ if __name__ == "__main__":
     parser.add_argument("--players", type=int, default=1, help="Number of players (excluding the dealer)")
     args = parser.parse_args()
     main()
+
+def threshold_strategy(hand, threshold=17):
+    """Returns 'hit ' if the hand value is below the threshold, otherwise 'stand'."""
+    if hand.value() < threshold:
+        return 'h'
+    else:
+        return 's'
