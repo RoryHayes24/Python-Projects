@@ -1,5 +1,5 @@
 # BLACKJACK PROJECT
-#### Video Demo:  https://youtu.be/4LGUGBaFIeY
+
 #### Description:
 This project creates a blackjack casino game, that deals hands to a given amount of players, which compete against a dealer controlled by the code. The program is initialised by calling the program name, with an optional --players input after, which can be used to change the amount of players (excluding the dealer) that are dealt in (default value is 1).
 Firstly, a standard deck of cards is generated (52), which contain Ace-King of each suit, using createdeck(). The deck is the shuffled, using the random library, and then dealt to the given amount of players and the dealer. In the instance that there are more cards required to be dealt than there are in the deck, a Value Error is raised, as is consistent across the project. After informing the players of the dealers 'face up card', each player is in turn told their cards, and the value of their hand (including hard/soft aces), and then asked whether they want to hit or stand, until they stand or they bust. If the player busts (over 21) they are informed, and their turn ends. Once all players have completed their turns, the dealer also undertakes the process, with the decisions made for them (hit on 16, stand on 17). Each hand is then in turn compared to the dealers, and each player is informed if they won, lost or tied.
