@@ -169,3 +169,48 @@ def play_hand(deck, hand, strategy):
         else:
             raise ValueError("Invalid strategy action. Must be 'h' or 's'.")
     return hand
+
+def dealer_strategy(hand):
+    """Dealer hits until reaching a value of 17 or more."""
+    if hand.value() < 17:
+        return 'h'
+    else:
+        return 's'
+
+def simulate_game(strategy, deck=None):
+    """Simulates a game of Blackjack using the provided strategy."""
+    data = {
+        "result": "Not Played",
+        "player_value": 0,
+        "dealer_value": 0,
+        "player_bust": False,
+        "dealer_bust": False
+    }
+    if deck is None:
+        deck = createdeck() 
+        deck = shuffledeck(deck)
+    hands = [Hand() for _ in range(2)]  # 1 player + 1 dealer
+    hands = dealhands(deck, hands)
+    
+    # Player's turn
+    play_hand(deck, hands[1], strategy)
+    
+    if hands[1].value() <= 21:
+        # Dealer's turn
+        play_hand(deck, hands[0], dealer_strategy)
+        if hands[0].value() > 21:
+            data["dealer_bust"] = True
+            data["result"] = "win"
+        elif hands[1].value() > hands[0].value():
+            data["result"] = "win"
+        elif hands[1].value() < hands[0].value():
+            data["result"] = "lose"
+        else:
+            data["result"] = "push"
+    else:
+        data["player_bust"] = True
+        data["result"] = "lose"
+    data["player_value"] = hands[1].value()
+    data["dealer_value"] = hands[0].value()
+
+    return data

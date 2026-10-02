@@ -1,5 +1,5 @@
 import pytest
-from project import Hand, createdeck, dealhands, dealers_turn, hit_or_stand, result_hand, threshold_strategy, play_hand
+from project import Hand, createdeck, dealhands, dealers_turn, hit_or_stand, result_hand, threshold_strategy, play_hand, simulate_game
 
 def test_create_deck():
     deck = createdeck()
@@ -141,3 +141,33 @@ def test_play_hand():
     hand.cards.append(('3', 'Diamonds'))
     with pytest.raises(ValueError):
         play_hand(deck, hand, strategy)  # Deck should run out of cards and raise ValueError
+
+def test_simulate_game():
+    strategy = threshold_strategy(17)
+    result = simulate_game(strategy)
+    assert result["result"] in ["win", "lose", "push"]
+    assert isinstance(result["player_value"], int)
+    assert isinstance(result["dealer_value"], int)
+    assert isinstance(result["player_bust"], bool)
+    assert isinstance(result["dealer_bust"], bool)
+    deck = [('10', 'Spades'), ('2', 'Hearts'), ('4', 'Diamonds'), ('8', 'Clubs'), ('6', 'Hearts'), ('10', 'Diamonds'), ('9', 'Clubs'), ('Queen', 'Spades')]
+    result = simulate_game(strategy, deck)
+    assert result["result"] == "lose"  # Player should lose with the given deck and strategy
+    assert result["player_value"] == 23
+    assert result["dealer_value"] == 20
+    assert result["player_bust"] == True
+    assert result["dealer_bust"] == False
+    deck = [('10', 'Spades'), ('2', 'Hearts'), ('7', 'Diamonds'), ('4', 'Clubs'), ('6', 'Hearts'), ('6', 'Diamonds'), ('9', 'Clubs'), ('Queen', 'Spades')]
+    result = simulate_game(strategy, deck)
+    assert result["result"] == "win"  # Player should win with the given deck and strategy
+    assert result["player_value"] == 19
+    assert result["dealer_value"] == 23
+    assert result["player_bust"] == False
+    assert result["dealer_bust"] == True
+    deck = [('10', 'Spades'), ('2', 'Hearts'), ('3', 'Diamonds'), ('4', 'Clubs'), ('6', 'Hearts'), ('6', 'Diamonds'), ('9', 'Clubs'), ('Queen', 'Spades')]
+    result = simulate_game(strategy, deck)
+    assert result["result"] == "push"  # Player should push with the given deck and strategy
+    assert result["player_value"] == 19
+    assert result["dealer_value"] == 19
+    assert result["player_bust"] == False
+    assert result["dealer_bust"] == False
