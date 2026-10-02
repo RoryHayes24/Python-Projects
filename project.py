@@ -143,9 +143,29 @@ if __name__ == "__main__":
     args = parser.parse_args()
     main()
 
-def threshold_strategy(hand, threshold=17):
-    """Returns 'hit ' if the hand value is below the threshold, otherwise 'stand'."""
-    if hand.value() < threshold:
-        return 'h'
-    else:
-        return 's'
+def threshold_strategy(threshold=17):
+    """Returns 'h' if the hand value is below the threshold, otherwise 's'."""
+    def strategy(hand):
+        if hand.value() < threshold:
+            return 'h'
+        else:
+            return 's'
+
+    return strategy
+
+def play_hand(deck, hand, strategy):
+    """Plays a hand using a given strategy."""
+    while True:
+        action = strategy(hand)
+        if action == 'h':
+            if deck:
+                hand.cards.append(deck.pop())
+                if hand.value() > 21:
+                    break
+            else:
+                raise ValueError("Not enough cards in the deck to hit.")
+        elif action == 's':
+            break
+        else:
+            raise ValueError("Invalid strategy action. Must be 'h' or 's'.")
+    return hand

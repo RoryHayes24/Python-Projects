@@ -1,5 +1,5 @@
 import pytest
-from project import Hand, createdeck, dealhands, dealers_turn, hit_or_stand, result_hand, threshold_strategy
+from project import Hand, createdeck, dealhands, dealers_turn, hit_or_stand, result_hand, threshold_strategy, play_hand
 
 def test_create_deck():
     deck = createdeck()
@@ -111,6 +111,33 @@ def test_threshold_strategy():
     hand.cards.append(('7', 'Diamonds'))
     
     # Test the threshold strategy
-    assert threshold_strategy(hand, 17) == 'h'  # Player should hit if value is below threshold
-    assert threshold_strategy(hand, 15) == 's'  # Player should stand if value is above threshold
-    assert threshold_strategy(hand, 16) == 's'  # Player should stand if value is at threshold
+    strategy = threshold_strategy(17)
+    assert strategy(hand) == 'h'  # Player should hit if value is below threshold
+    strategy = threshold_strategy(15)
+    assert strategy(hand) == 's'  # Player should stand if value is above threshold
+    strategy = threshold_strategy(16)
+    assert strategy(hand) == 's'  # Player should stand if value is at threshold
+    
+def test_play_hand():
+    deck = [('10', 'Spades'), ('2', 'Hearts'), ('4', 'Diamonds'), ('2', 'Clubs')]
+    strategy = threshold_strategy(16)
+    hand = Hand()
+    hand.cards.append(('6', 'Hearts'))
+    hand.cards.append(('3', 'Diamonds'))
+    play_hand(deck, hand, strategy)
+    assert len(hand.cards) == 5  # Player should have until reaching 16 or more hit and have received 3 cards
+    hand = Hand()
+    hand.cards.append(('10', 'Hearts'))
+    hand.cards.append(('7', 'Diamonds'))
+    play_hand(deck, hand, strategy)  # Threshold is 16, player should stand
+    assert len(hand.cards) == 2  # Player should have 2 cards and not hit
+    hand = Hand()
+    hand.cards.append(('10', 'Hearts'))
+    hand.cards.append(('4', 'Diamonds'))
+    play_hand(deck, hand, strategy)  # Threshold is 16, player should hit
+    assert len(hand.cards) == 3  # Player should have bust and finish with three cards
+    hand = Hand()
+    hand.cards.append(('10', 'Hearts'))
+    hand.cards.append(('3', 'Diamonds'))
+    with pytest.raises(ValueError):
+        play_hand(deck, hand, strategy)  # Deck should run out of cards and raise ValueError
