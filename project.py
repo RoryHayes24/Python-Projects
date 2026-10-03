@@ -228,7 +228,7 @@ def simulate_games(strategy, num_games=1000):
                "win_rate": 0.0,
                "loss_rate": 0.0,
                "push_rate": 0.0,
-               "expected_retun": 0.0
+               "expected_return": 0.0
                }
     for _ in range(num_games):
         game_result = simulate_game(strategy)
