@@ -214,3 +214,38 @@ def simulate_game(strategy, deck=None):
     data["dealer_value"] = hands[0].value()
 
     return data
+
+def simulate_games(strategy, num_games=1000):
+    """Simulates multiple games and returns statistics."""
+    if num_games <= 0 or num_games != int(num_games):
+        raise ValueError("Number of games must be a positive integer.")
+    results = {"games": 0,
+               "wins": 0,
+               "losses": 0,
+               "pushes": 0,
+               "player_busts": 0,
+               "dealer_busts": 0,
+               "win_rate": 0.0,
+               "loss_rate": 0.0,
+               "push_rate": 0.0,
+               "expected_retun": 0.0
+               }
+    for _ in range(num_games):
+        game_result = simulate_game(strategy)
+        results["games"] += 1
+        if game_result["result"] == "win":
+            results["wins"] += 1
+        elif game_result["result"] == "lose":
+            results["losses"] += 1
+        elif game_result["result"] == "push":
+            results["pushes"] += 1
+        if game_result["player_bust"]:
+            results["player_busts"] += 1
+        if game_result["dealer_bust"]:
+            results["dealer_busts"] += 1
+
+    results["win_rate"] = results["wins"] / results["games"]
+    results["loss_rate"] = results["losses"] / results["games"]
+    results["push_rate"] = results["pushes"] / results["games"]
+    results["expected_return"] = (results["wins"] - results["losses"]) / results["games"]
+    return results

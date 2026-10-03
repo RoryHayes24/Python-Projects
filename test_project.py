@@ -1,5 +1,5 @@
 import pytest
-from project import Hand, createdeck, dealhands, dealers_turn, hit_or_stand, result_hand, threshold_strategy, play_hand, simulate_game
+from project import Hand, createdeck, dealhands, dealers_turn, hit_or_stand, result_hand, threshold_strategy, play_hand, simulate_game, simulate_games
 
 def test_create_deck():
     deck = createdeck()
@@ -155,19 +155,36 @@ def test_simulate_game():
     assert result["result"] == "lose"  # Player should lose with the given deck and strategy
     assert result["player_value"] == 23
     assert result["dealer_value"] == 20
-    assert result["player_bust"] == True
-    assert result["dealer_bust"] == False
+    assert result["player_bust"] is True
+    assert result["dealer_bust"] is False
     deck = [('10', 'Spades'), ('2', 'Hearts'), ('7', 'Diamonds'), ('4', 'Clubs'), ('6', 'Hearts'), ('6', 'Diamonds'), ('9', 'Clubs'), ('Queen', 'Spades')]
     result = simulate_game(strategy, deck)
     assert result["result"] == "win"  # Player should win with the given deck and strategy
     assert result["player_value"] == 19
     assert result["dealer_value"] == 23
-    assert result["player_bust"] == False
-    assert result["dealer_bust"] == True
+    assert result["player_bust"] is False
+    assert result["dealer_bust"] is True
     deck = [('10', 'Spades'), ('2', 'Hearts'), ('3', 'Diamonds'), ('4', 'Clubs'), ('6', 'Hearts'), ('6', 'Diamonds'), ('9', 'Clubs'), ('Queen', 'Spades')]
     result = simulate_game(strategy, deck)
     assert result["result"] == "push"  # Player should push with the given deck and strategy
     assert result["player_value"] == 19
     assert result["dealer_value"] == 19
-    assert result["player_bust"] == False
-    assert result["dealer_bust"] == False
+    assert result["player_bust"] is False
+    assert result["dealer_bust"] is False
+
+def test_simulate_games():
+    strategy = threshold_strategy(17)
+    results = simulate_games(strategy, num_games=1000)
+    assert results["games"] == 1000
+    assert (results["wins"] + results["losses"] + results["pushes"]) == 1000
+    assert results["win_rate"] == results["wins"] / 1000
+    assert results["loss_rate"] == results["losses"] / 1000
+    assert results["push_rate"] == results["pushes"] / 1000
+    assert results["expected_return"] == (results["wins"] - results["losses"]) / 1000
+    assert 0 <= results["win_rate"] <= 1
+    assert 0 <= results["loss_rate"] <= 1
+    assert 0 <= results["push_rate"] <= 1
+    assert abs(results["win_rate"] + results["loss_rate"] + results["push_rate"] - 1) < 1e-10  # Rates should sum to 1
+    with pytest.raises(ValueError):
+        simulate_games(strategy, num_games=-1)  # Negative number of games should raise ValueError
+        simulate_games(strategy, num_games=0)  # Zero games should raise ValueError
