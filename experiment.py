@@ -1,26 +1,62 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import csv
 from project import threshold_strategy, simulate_games
 
 def main():
-    thresholds = []
-    expected_returns = []
-    standard_errors = []
-    for threshold in range(12, 21):  # Test thresholds from 12 to 20
-        strategy = threshold_strategy(threshold)
-        results_array = []
-        for _ in range(5):  # Run each simulation 5 times for averaging
-            results = simulate_games(strategy, 10000)
-            # print(f"Threshold: {threshold}, Results: {results['win_rate']:.2%} wins, {results['loss_rate']:.2%} losses, {results['push_rate']:.2%} pushes, Expected Return: {results['expected_return']:.4f}")
-            results_array.append(results['expected_return'])
-        avg_expected_return = np.mean(results_array)
-        std_expected_return = np.std(results_array, ddof=1)  # Sample standard deviation
-        standard_error = std_expected_return / np.sqrt(len(results_array))
-        thresholds.append(threshold)
-        expected_returns.append(avg_expected_return)
-        standard_errors.append(standard_error)
-    print(thresholds)
-    print(expected_returns)
+    with open("threshold_results.csv", "w", newline="") as file:
+        writer = csv.writer(file)
+
+        writer.writerow([
+            "Threshold",
+            "Run",
+            "Games",
+            "Wins",
+            "Losses",
+            "Pushes",
+            "Player Busts",
+            "Dealer Busts",
+            "Win Rate",
+            "Loss Rate",
+            "Push Rate",
+            "Expected Return"
+        ])
+    
+        thresholds = []
+        expected_returns = []
+        standard_errors = []
+        for threshold in range(12, 21):  # Test thresholds from 12 to 20
+            strategy = threshold_strategy(threshold)
+            results_array = []
+            for _ in range(5):  # Run each simulation 5 times for averaging
+                results = simulate_games(strategy, 10000)
+                writer.writerow([
+                    threshold,
+                    _ + 1,
+                    results["games"],
+                    results["wins"],
+                    results["losses"],
+                    results["pushes"],
+                    results["player_busts"],
+                    results["dealer_busts"],
+                    results["win_rate"],
+                    results["loss_rate"],
+                    results["push_rate"],
+                    results["expected_return"]
+                ])
+                results_array.append(results['expected_return'])
+            avg_expected_return = np.mean(results_array)
+            std_expected_return = np.std(results_array, ddof=1)  # Sample standard deviation
+            standard_error = std_expected_return / np.sqrt(len(results_array))
+            thresholds.append(threshold)
+            expected_returns.append(avg_expected_return)
+            standard_errors.append(standard_error)
+    for i in range(len(thresholds)):
+        print(
+            f"Threshold {thresholds[i]}: "
+            f"Mean EV = {expected_returns[i]:.5f}, "
+            f"SE = {standard_errors[i]:.5f}"
+        )
     plt.errorbar(thresholds, expected_returns, yerr=standard_errors)
     plt.xlabel('Threshold')
     plt.ylabel('Expected Return')
