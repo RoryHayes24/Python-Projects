@@ -4,7 +4,7 @@ import csv
 from project import threshold_strategy, simulate_games
 
 def main():
-    with open("threshold_results.csv", "w", newline="") as file:
+    with open("results/threshold_results.csv", "w", newline="") as file:
         writer = csv.writer(file)
 
         writer.writerow([
@@ -21,15 +21,11 @@ def main():
             "Push Rate",
             "Expected Return"
         ])
-    
-        thresholds = []
-        expected_returns = []
-        standard_errors = []
+
         for threshold in range(12, 21):  # Test thresholds from 12 to 20
             strategy = threshold_strategy(threshold)
-            results_array = []
             for _ in range(5):  # Run each simulation 5 times for averaging
-                results = simulate_games(strategy, 10000)
+                results = simulate_games(strategy, 1000000)
                 writer.writerow([
                     threshold,
                     _ + 1,
@@ -44,25 +40,7 @@ def main():
                     results["push_rate"],
                     results["expected_return"]
                 ])
-                results_array.append(results['expected_return'])
-            avg_expected_return = np.mean(results_array)
-            std_expected_return = np.std(results_array, ddof=1)  # Sample standard deviation
-            standard_error = std_expected_return / np.sqrt(len(results_array))
-            thresholds.append(threshold)
-            expected_returns.append(avg_expected_return)
-            standard_errors.append(standard_error)
-    for i in range(len(thresholds)):
-        print(
-            f"Threshold {thresholds[i]}: "
-            f"Mean EV = {expected_returns[i]:.5f}, "
-            f"SE = {standard_errors[i]:.5f}"
-        )
-    plt.errorbar(thresholds, expected_returns, yerr=standard_errors)
-    plt.xlabel('Threshold')
-    plt.ylabel('Expected Return')
-    plt.title('Expected Return vs Blackjack Hit Thresholds')
-    plt.grid(True)
-    plt.show()
+
     # strategy = threshold_strategy(15)  # Example threshold
     # for n in [100, 1000, 10000, 100000, 1000000]:
     #     for run in range(5):  # Run each simulation 5 times for averaging
